@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Finder</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Match Finder</h1>
+        </div>
+    </header>    
+    <div class="container">
+        <label for="searchType">Search Type:</label>
+        <select id="searchType">
+            <option value="name" selected>Search by Name</option>
+            <option value="username">Search by Username</option>
+        </select>
+
+        <div id="nameSearchSection" class="search-section">
+            <label for="searchNamesInput">Enter names to search (one per line):</label>
+            <textarea id="searchNamesInput" placeholder="E.g., Nyashadzashe Razo, Barry Allan" maxlength="50000"></textarea>
+        </div>
+
+        <div id="usernameSearchSection" class="search-section" style="display: none;">
+            <label for="searchUsernameInput">Enter username (combination of first name and first letter of surname):</label>
+            <textarea id="searchUsernameInput" placeholder="E.g., NyashadzasheR, TonyS" onpaste="handlePaste(event)" maxlength="50000"></textarea>
+        </div>
+
+        <label for="searchListInput">Enter the list to search in (one per line):</label>
+        <textarea id="searchListInput" placeholder="E.g., Nyashadzashe Razo, Tapiwa Razo" maxlength="50000"></textarea>
+
+        <button id="searchButton">Search</button>
+
+        <div id="searchResults">
+            <!-- Search results will be displayed here -->
+        </div>
+    </div>
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Razo Inc. All rights reserved.</p>
+        </div>
+    </footer>
+    
+
+    <script src="script.js"></script>
+</body>
+</html>
