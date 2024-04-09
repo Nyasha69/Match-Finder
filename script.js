@@ -2,6 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchTypeSelect = document.getElementById('searchType');
     const nameSearchSection = document.getElementById('nameSearchSection');
     const usernameSearchSection = document.getElementById('usernameSearchSection');
+    const searchButton = document.getElementById('searchButton');
+    const downloadButton = document.getElementById('downloadButton');
 
     searchTypeSelect.addEventListener('change', function() {
         const selectedOption = this.value;
@@ -14,24 +16,45 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    document.getElementById('searchButton').addEventListener('click', function() {
+    searchButton.addEventListener('click', function() {
         const searchType = searchTypeSelect.value;
         const searchNamesInput = document.getElementById('searchNamesInput');
         const searchListInput = document.getElementById('searchListInput');
         const searchUsernameInput = document.getElementById('searchUsernameInput');
         const searchResultsDiv = document.getElementById('searchResults');
 
-        // Clear previous search results
+        // Clear previous search results and download link
         searchResultsDiv.innerHTML = '';
+        downloadButton.href = '';
+        downloadButton.style.display = 'none';
 
-        // Get the entered names and list as arrays
-        const searchNames = searchNamesInput.value.split('\n').map(name => name.trim().toLowerCase());
-        const searchList = searchListInput.value.split('\n').map(name => name.trim().toLowerCase());
-        const searchUsernameLines = searchUsernameInput.value.split('\n').map(username => username.trim().toLowerCase());
+        // Get the entered names and list as arrays, skipping empty lines
+        const searchNames = searchNamesInput.value.split('\n').filter(name => name.trim() !== '').map(name => name.trim().toLowerCase());
+        const searchList = searchListInput.value.split('\n').filter(name => name.trim() !== '').map(name => name.trim().toLowerCase());
+        const searchUsernameLines = searchUsernameInput.value.split('\n').filter(username => username.trim() !== '').map(username => username.trim().toLowerCase());
+
+        // Perform validation for empty inputs
+        if (searchType === 'name' && searchNames.length === 0) {
+            alert('Please enter names to search.');
+            return;
+        }
+
+        if (searchList.length === 0) {
+            alert('Please enter the list to search in.');
+            return;
+        }
+
+        if (searchType === 'username' && searchUsernameLines.length === 0) {
+            alert('Please enter usernames to search.');
+            return;
+        }
 
         // Create an ordered list for the search results
         const resultList = document.createElement('ol');
         resultList.style.listStyleType = 'none'; // Remove default numbering
+
+        // Array to store found names for download
+        let foundNames = [];
 
         // Perform the search based on the selected search type
         if (searchType === 'name') {
@@ -39,9 +62,10 @@ document.addEventListener('DOMContentLoaded', function() {
             searchNames.forEach(name => {
                 if (searchList.includes(name)) {
                     const resultItem = document.createElement('li');
-                    resultItem.textContent = `${name}:`;
+                    resultItem.textContent = `${name}: Found`;
                     resultItem.style.color = 'green'; // Found names are green
                     resultList.appendChild(resultItem);
+                    foundNames.push(name); // Add found names to the array
                 } else {
                     const resultItem = document.createElement('li');
                     resultItem.textContent = `${name}: Not Found`;
@@ -68,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         resultItem.textContent = `${searchUsername} (Similarity: ${Math.round(similarity * 100)}%): Matched with ${matchingUsername}`;
                         resultItem.style.color = 'green'; // Matched usernames are green
                         resultList.appendChild(resultItem);
+                        foundNames.push(matchingUsername); // Add matched usernames to the array
                     });
                 } else {
                     const resultItem = document.createElement('li');
@@ -83,6 +108,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Show the search results div
         searchResultsDiv.style.display = 'block';
+
+        // Enable download button if there are found names
+        if (foundNames.length > 0) {
+            const blob = new Blob([foundNames.join('\n')], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            downloadButton.href = url;
+            downloadButton.download = 'found_names.txt';
+            downloadButton.style.display = 'inline-block';
+        }
     });
 
     // Function to calculate similarity index between two strings
